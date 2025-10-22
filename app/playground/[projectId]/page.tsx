@@ -75,10 +75,6 @@ function PlayGround() {
     setFrameDetails(result.data);
     if(result.data?.chatMessages && result.data.chatMessages.length > 0){
      setMessages(result.data.chatMessages);
-     const firstUserMessage = result.data.chatMessages.find((msg: Messages) => msg.role === 'user');
-     if(firstUserMessage) {
-       SendMessage(firstUserMessage.content);
-     }
     }
   } catch (error) {
     console.error('Error fetching frame details:', error);
@@ -144,8 +140,20 @@ function PlayGround() {
  }
 
  useEffect(()=>{
-  console.log(generatedCode);
- },[generatedCode])
+  if(messages.length > 0 )
+    SaveMessages();
+  {
+
+  }
+ },[messages])
+
+ const SaveMessages=async()=>{
+       const result = await axios.put('/api/chats',{
+           messages:messages,
+           frameId:frameId
+       });
+       console.log(result);
+ }
 
   
   return (
@@ -156,7 +164,7 @@ function PlayGround() {
       <div className='flex' >
        <ChatSection messages={messages??[]} onSend={(input:string)=>SendMessage(input)} loading={loading} />
       {/* WebsiteDesign */}
-      <WebsiteDesign/>
+      <WebsiteDesign generatedCode={generatedCode?.replace('```','')}/>
 
       {/* Setting Section */}
       {/* <ElementSettingSection/> */}
